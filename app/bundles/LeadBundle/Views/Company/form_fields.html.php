@@ -127,6 +127,14 @@ foreach ($groups as $key => $group):
                             <?php endforeach; ?>
                         </div>
                     </div>
+                    <hr class="mnr-md mnl-md">
+                    <div class="form-group mb-0">
+                        <div class="row mb-xs">
+                            <div class="col-sm-<?php echo $fullSize; ?>">
+                                <?php echo $view['form']->row($form['assetAttachments']); ?>
+                            </div>
+                        </div>
+                    </div>
                     <?php if (!empty($embedded)): ?>
                         <hr class="mnr-md mnl-md">
                         <div>

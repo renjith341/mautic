@@ -11,8 +11,10 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -107,11 +109,24 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     private $description;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $assetAttachments;
+
     public function __clone()
     {
         $this->id = null;
 
         parent::__clone();
+    }
+
+    /**
+     * Company constructor.
+     */
+    public function __construct()
+    {
+        $this->assetAttachments = new ArrayCollection();
     }
 
     /**
@@ -163,6 +178,13 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->nullable()
             ->build();
 
+        $builder->createManyToMany('assetAttachments', 'Mautic\AssetBundle\Entity\Asset')
+            ->setJoinTable('companies_assets_xref')
+            ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+
         self::loadFixedFieldMetadata(
             $builder,
             [
@@ -207,6 +229,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
                     'industry',
                     'description',
                     'score',
+                    'assetAttachments',
                 ]
             )
             ->setGroupPrefix('company')
@@ -558,5 +581,39 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         $this->description = $description;
 
         return $this;
+    }
+
+    /**
+     * Add asset.
+     *
+     * @param Asset $asset
+     *
+     * @return Company
+     */
+    public function addAssetAttachment(Asset $asset)
+    {
+        $this->assetAttachments[] = $asset;
+
+        return $this;
+    }
+
+    /**
+     * Remove asset.
+     *
+     * @param Asset $asset
+     */
+    public function removeAssetAttachment(Asset $asset)
+    {
+        $this->assetAttachments->removeElement($asset);
+    }
+
+    /**
+     * Get assetAttachments.
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAssetAttachments()
+    {
+        return $this->assetAttachments;
     }
 }

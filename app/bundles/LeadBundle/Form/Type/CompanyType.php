@@ -97,6 +97,31 @@ class CompanyType extends AbstractType
             ]
         );
 
+        //add lead lists
+        $transformer = new IdToEntityModelTransformer(
+            $this->em,
+            'MauticAssetBundle:Asset',
+            'id',
+            true
+        );
+        $builder->add(
+            $builder->create(
+                'assetAttachments',
+                'asset_list',
+                [
+                    'label'      => 'mautic.lead.company.field.attachments',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'onchange' => 'Mautic.getTotalAttachmentSize();',
+                    ],
+                    'multiple' => true,
+                    'expanded' => false,
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
